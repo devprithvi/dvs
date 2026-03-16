@@ -16,10 +16,14 @@ from pydantic import BaseModel, Field
 # ── Enums ──────────────────────────────────────────────────────────────────
 
 class DocumentType(str, Enum):
+    AADHAAR         = "aadhaar"
+    PAN             = "pan"
     PASSPORT        = "passport"
+    VISA            = "visa"
+    AIR_TICKET      = "air_ticket"
+    AD2             = "ad2"                 # Arrival/Departure card
     DRIVERS_LICENSE = "drivers_license"
     NATIONAL_ID     = "national_id"
-    VISA            = "visa"
     UTILITY_BILL    = "utility_bill"
     BANK_STATEMENT  = "bank_statement"
     EMPLOYMENT_DOC  = "employment_doc"
@@ -50,36 +54,46 @@ class MatchScore(BaseModel):
     matched: bool
 
 
+class SignatureMatchScore(BaseModel):
+    """Signature comparison result between two documents."""
+    doc_a:   str
+    doc_b:   str
+    score:   float
+    matched: bool
+
+
 # ── Document Result ────────────────────────────────────────────────────────
 
 class DocumentResult(BaseModel):
     """Result of processing a single uploaded document."""
-    document_id:              str          = Field(default_factory=lambda: str(uuid.uuid4()))
-    filename:                 str
-    document_type:            DocumentType
+    document_id:               str          = Field(default_factory=lambda: str(uuid.uuid4()))
+    filename:                  str
+    document_type:             DocumentType
     classification_confidence: float
-    extracted_fields:         List[ExtractedField] = []
-    has_face:                 bool                 = False
-    face_confidence:          Optional[float]      = None
-    processing_time_ms:       int                  = 0
-    status:                   VerificationStatus   = VerificationStatus.VERIFIED
+    extracted_fields:          List[ExtractedField] = []
+    has_face:                  bool                 = False
+    face_confidence:           Optional[float]      = None
+    has_signature:             bool                 = False
+    processing_time_ms:        int                  = 0
+    status:                    VerificationStatus   = VerificationStatus.VERIFIED
 
 
 # ── Verification Result ────────────────────────────────────────────────────
 
 class VerificationResult(BaseModel):
     """Full cross-document verification session result."""
-    session_id:             str                    = Field(default_factory=lambda: str(uuid.uuid4()))
-    documents:              List[DocumentResult]   = []
-    overall_confidence:     float                  = 0.0
-    identity_match:         bool                   = False
-    match_scores:           List[MatchScore]        = []
-    face_match_score:       Optional[float]        = None
-    issues:                 List[str]              = []
-    status:                 VerificationStatus     = VerificationStatus.PENDING
-    created_at:             datetime               = Field(default_factory=datetime.utcnow)
-    completed_at:           Optional[datetime]     = None
-    total_processing_time_ms: int                  = 0
+    session_id:               str                      = Field(default_factory=lambda: str(uuid.uuid4()))
+    documents:                List[DocumentResult]     = []
+    overall_confidence:       float                    = 0.0
+    identity_match:           bool                     = False
+    match_scores:             List[MatchScore]          = []
+    face_match_score:         Optional[float]          = None
+    signature_matches:        List[SignatureMatchScore] = []
+    issues:                   List[str]                = []
+    status:                   VerificationStatus       = VerificationStatus.PENDING
+    created_at:               datetime                 = Field(default_factory=datetime.utcnow)
+    completed_at:             Optional[datetime]       = None
+    total_processing_time_ms: int                      = 0
 
 
 # ── API Wrapper ────────────────────────────────────────────────────────────

@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 from starlette.responses import HTMLResponse
 
@@ -15,9 +17,6 @@ frontend_path = Path(__file__).parent / "app" / "frontend"
 async def serve_frontend():
     with open(frontend_path / "index.html") as f:
         return f.read()
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
 
 
 @app.get("/hello/{name}")

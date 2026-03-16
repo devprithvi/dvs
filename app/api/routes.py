@@ -28,7 +28,6 @@ from app.models.schemas import (
 router = APIRouter()
 
 # ── In-memory session store ────────────────────────────────────────────────
-# Replace with PostgreSQL + SQLAlchemy in production (Milestone 3)
 _sessions: dict[str, dict] = {}
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -55,24 +54,28 @@ async def upload_and_verify(files: List[UploadFile] = File(...)):
     """
     Upload between 1 and 10 documents (PDF / JPG / PNG / TIFF).
 
+    Supported document types:
+      Aadhaar, PAN, Passport, Visa, Air Ticket, AD2 (Arrival/Departure Card),
+      Driver's Licence, Voter ID, Utility Bill, Bank Statement, Employment Doc
+
     Returns a **VerificationResult** containing:
-    - Extracted fields per document
-    - Cross-document name & DOB match scores
+    - Extracted fields per document (name, DOB, address, parent names,
+      ID number, mobile, expiry, face, signature)
+    - Cross-document name, DOB, address, mobile, passport-number, parent-name match scores
     - Biometric face-match score (where applicable)
+    - Signature presence cross-match
     - Overall identity confidence (0–1)
-    - Flagged issues
+    - Flagged issues (mismatches, expired documents)
     """
-    # ── Validate input ─────────────────────────────────────────────────────
     if len(files) == 0:
         raise HTTPException(status_code=400, detail="At least 1 document is required.")
     if len(files) > MAX_FILES:
         raise HTTPException(status_code=400, detail=f"Maximum {MAX_FILES} documents per batch.")
 
-    session_id = str(uuid.uuid4())
-    t_start    = time.time()
+    session_id  = str(uuid.uuid4())
+    t_start     = time.time()
     doc_results = []
 
-    # ── Process each file ──────────────────────────────────────────────────
     for upload in files:
         content = await upload.read()
 
@@ -85,8 +88,8 @@ async def upload_and_verify(files: List[UploadFile] = File(...)):
         result = process_document(upload.filename or "document", content)
         doc_results.append(result)
 
-    # ── Cross-verify ───────────────────────────────────────────────────────
-    overall_conf, match_scores, face_score, issues = match_documents(doc_results)
+    # ── Cross-verify (now returns 5 values) ───────────────────────────────
+    overall_conf, match_scores, face_score, sig_matches, issues = match_documents(doc_results)
     total_ms = int((time.time() - t_start) * 1000)
 
     # ── Determine status ───────────────────────────────────────────────────
@@ -97,7 +100,6 @@ async def upload_and_verify(files: List[UploadFile] = File(...)):
     else:
         status = VerificationStatus.FAILED
 
-    # ── Build result ───────────────────────────────────────────────────────
     verification = VerificationResult(
         session_id=session_id,
         documents=doc_results,
@@ -105,13 +107,13 @@ async def upload_and_verify(files: List[UploadFile] = File(...)):
         identity_match=overall_conf >= 0.75,
         match_scores=match_scores,
         face_match_score=face_score,
+        signature_matches=sig_matches,
         issues=issues,
         status=status,
         completed_at=datetime.utcnow(),
         total_processing_time_ms=total_ms,
     )
 
-    # ── Persist session ────────────────────────────────────────────────────
     _sessions[session_id] = verification.model_dump(mode="json")
 
     return APIResponse(
