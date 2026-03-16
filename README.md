@@ -14,7 +14,7 @@ uvicorn app.main:app --reload --port 8000
 
 Open in browser:
 - **UI**      → http://localhost:8000
-- **Swagger** → http://localhost:8000/api/docs
+- **Swagger** → http://localhost:8000/**api/docs**
 - **ReDoc**   → http://localhost:8000/api/redoc
 
 ---

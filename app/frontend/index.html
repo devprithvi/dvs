@@ -1,220 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DVS — Document Verification System</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-/* ── Reset & Variables ─────────────────────────────────────────────────── */
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0a0c10; --surface:#111318; --surface2:#181c24; --border:#1e2530;
-  --accent:#00d4aa; --accent2:#4f8ef7; --warn:#f5a623; --danger:#e05252;
-  --text:#e8eaf0; --muted:#5a6070;
-  --mono:'IBM Plex Mono',monospace; --sans:'Syne',sans-serif;
-  --radius:10px;
-}
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DVS — Document Verification System</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0c10;--surface:#111318;--surface2:#181c24;--border:#1e2530;
+      --accent:#00d4aa;--accent2:#4f8ef7;--warn:#f5a623;--danger:#e05252;
+      --text:#e8eaf0;--muted:#5a6070;
+      --mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;--radius:10px;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:linear-gradient(rgba(0,212,170,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,212,170,.03) 1px,transparent 1px);
+      background-size:48px 48px;}
+    a{color:var(--accent2);text-decoration:none}
 
-/* ── Base ──────────────────────────────────────────────────────────────── */
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(0,212,170,.03) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(0,212,170,.03) 1px,transparent 1px);
-  background-size:48px 48px;
-}
-a{color:var(--accent2);text-decoration:none}
-a:hover{text-decoration:underline}
+    /* Header */
+    header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.93);backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);padding:0 2rem;height:58px;display:flex;align-items:center;gap:1.5rem;}
+    .logo{font-size:1.05rem;font-weight:800;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+    .logo span{color:var(--text)}
+    .hdr-right{margin-left:auto;display:flex;align-items:center;gap:1rem}
+    .online-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+    .hdr-label{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.06em}
 
-/* ── Header ────────────────────────────────────────────────────────────── */
-header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(10,12,16,.93);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  padding:0 2rem;height:58px;
-  display:flex;align-items:center;gap:1.5rem;
-}
-.logo{font-size:1.05rem;font-weight:800;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
-.logo span{color:var(--text)}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:1rem}
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.hdr-label{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.06em}
+    /* Nav */
+    nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;position:relative;z-index:10;}
+    nav button{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--mono);
+      font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;padding:.8rem 1.1rem;cursor:pointer;transition:all .2s;}
+    nav button.active{color:var(--accent);border-bottom-color:var(--accent)}
+    nav button:hover:not(.active){color:var(--text)}
 
-/* ── Nav ────────────────────────────────────────────────────────────────── */
-nav{
-  display:flex;background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:0 2rem;position:relative;z-index:10;
-}
-nav button{
-  background:none;border:none;border-bottom:2px solid transparent;
-  color:var(--muted);font-family:var(--mono);font-size:.75rem;
-  text-transform:uppercase;letter-spacing:.08em;
-  padding:.8rem 1.1rem;cursor:pointer;transition:all .2s;
-}
-nav button.active{color:var(--accent);border-bottom-color:var(--accent)}
-nav button:hover:not(.active){color:var(--text)}
+    /* Main */
+    main{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:2rem}
+    .tab-panel{display:none}.tab-panel.active{display:block}
 
-/* ── Main ───────────────────────────────────────────────────────────────── */
-main{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:2rem}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
+    /* Mode selector cards */
+    .mode-card{
+      border:2px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;
+      cursor:pointer;transition:all .2s;background:var(--surface);display:flex;align-items:center;gap:.9rem;
+    }
+    .mode-card:hover{border-color:var(--accent2);background:rgba(79,142,247,.04)}
+    .mode-card.active{border-color:var(--accent);background:rgba(0,212,170,.06)}
+    .mode-icon{font-size:1.5rem}
+    .mode-title{font-size:.9rem;font-weight:700;margin-bottom:.2rem}
+    .mode-sub{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
 
-/* ── Upload zone ─────────────────────────────────────────────────────────── */
-.upload-zone{
-  border:2px dashed var(--border);border-radius:14px;
-  padding:3.5rem 2rem;text-align:center;cursor:pointer;
-  background:var(--surface);transition:all .25s;position:relative;overflow:hidden;
-}
-.upload-zone::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,rgba(0,212,170,.06) 0%,transparent 70%);
-  opacity:0;transition:opacity .3s;pointer-events:none;
-}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:rgba(0,212,170,.03)}
-.upload-zone:hover::after,.upload-zone.drag-over::after{opacity:1}
-.uz-icon{font-size:3rem;display:block;margin-bottom:1rem}
-.uz-title{font-size:1.15rem;font-weight:700;margin-bottom:.5rem}
-.uz-sub{font-family:var(--mono);font-size:.73rem;color:var(--muted)}
-#fileInput{display:none}
+    /* Upload zone */
+    .upload-zone{border:2px dashed var(--border);border-radius:14px;padding:3rem 2rem;text-align:center;
+      cursor:pointer;background:var(--surface);transition:all .25s;position:relative;overflow:hidden;}
+    .upload-zone::after{content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse at center,rgba(0,212,170,.06) 0%,transparent 70%);
+      opacity:0;transition:opacity .3s;pointer-events:none;}
+    .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:rgba(0,212,170,.03)}
+    .upload-zone:hover::after,.upload-zone.drag-over::after{opacity:1}
+    .uz-icon{font-size:2.8rem;display:block;margin-bottom:.9rem}
+    .uz-title{font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+    .uz-sub{font-family:var(--mono);font-size:.73rem;color:var(--muted);margin-bottom:.85rem}
+    .fmt-pill{display:inline-block;padding:.2rem .6rem;border-radius:6px;font-family:var(--mono);font-size:.68rem;
+      background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
 
-/* ── File chips ──────────────────────────────────────────────────────────── */
-.file-list{margin-top:1.25rem;display:flex;flex-direction:column;gap:.45rem}
-.file-chip{
-  display:flex;align-items:center;gap:.9rem;
-  padding:.65rem 1rem;background:var(--surface);
-  border:1px solid var(--border);border-radius:8px;
-  font-family:var(--mono);font-size:.78rem;
-  animation:fadeUp .2s ease;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.chip-icon{font-size:1.2rem}
-.chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip-size{color:var(--muted);font-size:.7rem;white-space:nowrap}
-.chip-rm{background:none;border:none;color:var(--danger);cursor:pointer;padding:0 4px;font-size:.95rem;opacity:.7;transition:opacity .2s}
-.chip-rm:hover{opacity:1}
+    /* File chips */
+    .file-list{margin-top:1.25rem;display:flex;flex-direction:column;gap:.4rem}
+    .file-chip{display:flex;align-items:center;gap:.9rem;padding:.6rem 1rem;background:var(--surface);
+      border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:.78rem;animation:fadeUp .2s ease;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+    .chip-icon{font-size:1.1rem}.chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .chip-size{color:var(--muted);font-size:.7rem;white-space:nowrap}
+    .chip-rm{background:none;border:none;color:var(--danger);cursor:pointer;padding:0 4px;font-size:.9rem;opacity:.7}
+    .chip-rm:hover{opacity:1}
 
-/* ── Progress ────────────────────────────────────────────────────────────── */
-.progress-wrap{display:none;margin-top:1.5rem}
-.prog-meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:.45rem}
-.prog-track{height:4px;background:var(--border);border-radius:4px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .35s ease;width:0%}
+    /* Folder summary row (bulk mode) */
+    .folder-row{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;background:var(--surface);
+      border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:.78rem;animation:fadeUp .2s ease;}
+    .folder-row .fr-name{flex:1;font-weight:600;color:var(--text)}
+    .folder-row .fr-count{color:var(--muted);white-space:nowrap}
+    .folder-row .fr-status{white-space:nowrap}
+    .folder-rm{background:none;border:none;color:var(--danger);cursor:pointer;padding:0 4px;font-size:.9rem;opacity:.7}
+    .folder-rm:hover{opacity:1}
 
-/* ── Buttons ─────────────────────────────────────────────────────────────── */
-.action-bar{display:flex;gap:.75rem;margin-top:1.4rem;align-items:center;flex-wrap:wrap}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:.5rem;
-  background:var(--accent);color:#000;border:none;border-radius:8px;
-  padding:.75rem 1.6rem;font-family:var(--mono);font-size:.8rem;font-weight:600;
-  text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .2s;
-}
-.btn-primary:hover{background:#00b891;transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:.5rem;background:transparent;
-  color:var(--muted);border:1px solid var(--border);border-radius:8px;
-  padding:.75rem 1.3rem;font-family:var(--mono);font-size:.8rem;
-  cursor:pointer;transition:all .2s;
-}
-.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+    /* Progress */
+    .progress-wrap{display:none;margin-top:1.4rem}
+    .prog-meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:.45rem}
+    .prog-track{height:4px;background:var(--border);border-radius:4px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .35s ease;width:0%}
 
-/* ── Card ────────────────────────────────────────────────────────────────── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem}
-.card-hdr{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.card-title{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    /* Buttons */
+    .action-bar{display:flex;gap:.75rem;margin-top:1.4rem;align-items:center;flex-wrap:wrap}
+    .btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:#000;border:none;
+      border-radius:8px;padding:.75rem 1.6rem;font-family:var(--mono);font-size:.8rem;font-weight:600;
+      text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .2s;}
+    .btn-primary:hover{background:#00b891;transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-ghost{display:inline-flex;align-items:center;gap:.5rem;background:transparent;color:var(--muted);
+      border:1px solid var(--border);border-radius:8px;padding:.75rem 1.3rem;font-family:var(--mono);
+      font-size:.8rem;cursor:pointer;transition:all .2s;}
+    .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
 
-/* ── Badges ──────────────────────────────────────────────────────────────── */
-.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .7rem;border-radius:99px;font-family:var(--mono);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-.badge.success{background:rgba(0,212,170,.14);color:var(--accent)}
-.badge.warning{background:rgba(245,166,35,.14);color:var(--warn)}
-.badge.danger{background:rgba(224,82,82,.14);color:var(--danger)}
-.badge.info{background:rgba(79,142,247,.14);color:var(--accent2)}
+    /* Card */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem}
+    .card-hdr{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 
-/* ── Results section ─────────────────────────────────────────────────────── */
-.result-section{display:none;margin-top:2rem}
-.result-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;flex-wrap:wrap;gap:.75rem}
-.result-title{font-size:1.25rem;font-weight:700}
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .7rem;border-radius:99px;
+      font-family:var(--mono);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    .badge.success{background:rgba(0,212,170,.14);color:var(--accent)}
+    .badge.warning{background:rgba(245,166,35,.14);color:var(--warn)}
+    .badge.danger{background:rgba(224,82,82,.14);color:var(--danger)}
+    .badge.info{background:rgba(79,142,247,.14);color:var(--accent2)}
 
-/* ── Confidence cards ────────────────────────────────────────────────────── */
-.conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem}
-.conf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;text-align:center}
-.conf-val{font-family:var(--mono);font-size:2.2rem;font-weight:600;line-height:1;margin-bottom:.35rem}
-.conf-label{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
-.gauge-wrap{display:flex;justify-content:center;margin-bottom:.6rem}
-.gauge-svg{width:84px;height:84px}
+    /* Results */
+    .result-section{display:none;margin-top:2rem}
+    .result-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;flex-wrap:wrap;gap:.75rem}
+    .result-title{font-size:1.25rem;font-weight:700}
+    .conf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem}
+    .conf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;text-align:center}
+    .conf-val{font-family:var(--mono);font-size:2.2rem;font-weight:600;line-height:1;margin-bottom:.35rem}
+    .conf-label{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+    .gauge-wrap{display:flex;justify-content:center;margin-bottom:.6rem}
+    .gauge-svg{width:84px;height:84px}
 
-/* ── Table ───────────────────────────────────────────────────────────────── */
-table{width:100%;border-collapse:collapse}
-th{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;padding:.7rem 1.2rem;border-bottom:1px solid var(--border)}
-td{padding:.72rem 1.2rem;font-family:var(--mono);font-size:.78rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.015)}
+    /* Table */
+    table{width:100%;border-collapse:collapse}
+    th{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+      text-align:left;padding:.7rem 1.2rem;border-bottom:1px solid var(--border)}
+    td{padding:.72rem 1.2rem;font-family:var(--mono);font-size:.78rem;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(255,255,255,.015)}
+    .sbar-wrap{display:flex;align-items:center;gap:.65rem}
+    .sbar-track{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+    .sbar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+    .sbar-pct{min-width:40px;text-align:right;font-size:.72rem}
 
-/* Score bar inside table */
-.sbar-wrap{display:flex;align-items:center;gap:.65rem}
-.sbar-track{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
-.sbar-fill{height:100%;border-radius:4px;transition:width .6s ease}
-.sbar-pct{min-width:40px;text-align:right;font-size:.72rem}
+    /* Doc grid */
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;padding:1rem}
+    .doc-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp .3s ease}
+    .doc-card-hdr{padding:.85rem 1rem;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem}
+    .dc-icon{font-size:1.35rem}.dc-info{flex:1;overflow:hidden}
+    .dc-name{font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .dc-type{font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+    .doc-card-body{padding:.7rem 1rem}
+    .field-row{display:flex;justify-content:space-between;align-items:flex-start;padding:.3rem 0;border-bottom:1px solid rgba(30,37,48,.5);gap:.75rem}
+    .field-row:last-child{border-bottom:none}
+    .fk{font-family:var(--mono);font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+    .fv{font-family:var(--mono);font-size:.72rem;color:var(--text);text-align:right;word-break:break-all}
+    .conf-pill{display:inline-block;padding:1px 5px;border-radius:4px;font-size:.62rem;background:rgba(0,212,170,.1);color:var(--accent);margin-left:3px}
 
-/* ── Document grid ───────────────────────────────────────────────────────── */
-.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;padding:1rem}
-.doc-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;animation:fadeUp .3s ease}
-.doc-card-hdr{padding:.85rem 1rem;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem}
-.dc-icon{font-size:1.35rem}
-.dc-info{flex:1;overflow:hidden}
-.dc-name{font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dc-type{font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
-.doc-card-body{padding:.7rem 1rem}
-.field-row{display:flex;justify-content:space-between;align-items:flex-start;padding:.3rem 0;border-bottom:1px solid rgba(30,37,48,.5);gap:.75rem}
-.field-row:last-child{border-bottom:none}
-.fk{font-family:var(--mono);font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
-.fv{font-family:var(--mono);font-size:.72rem;color:var(--text);text-align:right;word-break:break-all}
-.conf-pill{display:inline-block;padding:1px 5px;border-radius:4px;font-size:.62rem;font-family:var(--mono);background:rgba(0,212,170,.1);color:var(--accent);margin-left:3px}
+    /* Issues */
+    .issues-body{display:flex;flex-direction:column;gap:.45rem;padding:1rem 1.2rem}
+    .issue-item{display:flex;align-items:flex-start;gap:.5rem;font-family:var(--mono);font-size:.76rem;color:var(--warn);
+      padding:.45rem .7rem;background:rgba(245,166,35,.07);border-left:3px solid var(--warn);border-radius:0 6px 6px 0}
 
-/* ── Issues ──────────────────────────────────────────────────────────────── */
-.issues-body{display:flex;flex-direction:column;gap:.45rem;padding:1rem 1.2rem}
-.issue-item{display:flex;align-items:flex-start;gap:.5rem;font-family:var(--mono);font-size:.76rem;color:var(--warn);padding:.45rem .7rem;background:rgba(245,166,35,.07);border-left:3px solid var(--warn);border-radius:0 6px 6px 0}
+    /* Bulk result accordion */
+    .bulk-session{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:.75rem;animation:fadeUp .3s ease}
+    .bulk-session-hdr{display:flex;align-items:center;gap:1rem;padding:.85rem 1.1rem;cursor:pointer;
+      background:var(--surface);transition:background .15s;user-select:none}
+    .bulk-session-hdr:hover{background:var(--surface2)}
+    .bsh-folder{font-weight:700;font-size:.9rem;flex:1}
+    .bsh-meta{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+    .bsh-chevron{font-size:.85rem;color:var(--muted);transition:transform .2s}
+    .bsh-chevron.open{transform:rotate(180deg)}
+    .bulk-session-body{display:none;padding:1.2rem;background:var(--surface2);border-top:1px solid var(--border)}
+    .bulk-session-body.open{display:block}
 
-/* ── Stats grid ──────────────────────────────────────────────────────────── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;text-align:center}
-.stat-val{font-family:var(--mono);font-size:2rem;font-weight:600;line-height:1;margin-bottom:.35rem}
-.stat-label{font-family:var(--mono);font-size:.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;text-align:center}
+    .stat-val{font-family:var(--mono);font-size:2rem;font-weight:600;line-height:1;margin-bottom:.35rem}
+    .stat-label{font-family:var(--mono);font-size:.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 
-/* ── Sessions list ───────────────────────────────────────────────────────── */
-.session-row{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;font-family:var(--mono);font-size:.76rem}
-.session-row:last-child{border-bottom:none}
-.session-row:hover{background:rgba(255,255,255,.02)}
-.s-id{color:var(--accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.s-docs,.s-time{color:var(--muted);white-space:nowrap}
-.s-conf{white-space:nowrap}
+    /* Sessions */
+    .session-row{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--border);
+      cursor:pointer;transition:background .15s;font-family:var(--mono);font-size:.76rem}
+    .session-row:last-child{border-bottom:none}.session-row:hover{background:rgba(255,255,255,.02)}
+    .s-id{color:var(--accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .s-docs,.s-time{color:var(--muted);white-space:nowrap}.s-conf{white-space:nowrap}
 
-/* ── API ref table ───────────────────────────────────────────────────────── */
-.method-badge{display:inline-block;padding:.2rem .55rem;border-radius:5px;font-family:var(--mono);font-size:.65rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-.m-post{background:rgba(0,212,170,.15);color:var(--accent)}
-.m-get{background:rgba(79,142,247,.15);color:var(--accent2)}
-.m-del{background:rgba(224,82,82,.15);color:var(--danger)}
+    /* API ref */
+    .method-badge{display:inline-block;padding:.2rem .55rem;border-radius:5px;font-family:var(--mono);font-size:.65rem;font-weight:600;text-transform:uppercase}
+    .m-post{background:rgba(0,212,170,.15);color:var(--accent)}
+    .m-get{background:rgba(79,142,247,.15);color:var(--accent2)}
+    .m-del{background:rgba(224,82,82,.15);color:var(--danger)}
 
-/* ── Toast ───────────────────────────────────────────────────────────────── */
-.toast{position:fixed;bottom:2rem;right:2rem;padding:.85rem 1.3rem;border-radius:10px;font-family:var(--mono);font-size:.78rem;z-index:9999;animation:fadeUp .3s ease;max-width:380px;line-height:1.4}
-.toast.success{background:rgba(0,212,170,.13);border:1px solid var(--accent);color:var(--accent)}
-.toast.error{background:rgba(224,82,82,.13);border:1px solid var(--danger);color:var(--danger)}
+    /* Toast */
+    .toast{position:fixed;bottom:2rem;right:2rem;padding:.85rem 1.3rem;border-radius:10px;font-family:var(--mono);
+      font-size:.78rem;z-index:9999;animation:fadeUp .3s ease;max-width:380px;line-height:1.4}
+    .toast.success{background:rgba(0,212,170,.13);border:1px solid var(--accent);color:var(--accent)}
+    .toast.error{background:rgba(224,82,82,.13);border:1px solid var(--danger);color:var(--danger)}
+    .toast.info{background:rgba(79,142,247,.13);border:1px solid var(--accent2);color:var(--accent2)}
 
-/* ── Responsive ──────────────────────────────────────────────────────────── */
-@media(max-width:700px){
-  .conf-grid{grid-template-columns:1fr}
-  .doc-grid{grid-template-columns:1fr}
-  header{padding:0 1rem}
-  main{padding:1rem}
-  nav{padding:0 .5rem}
-}
-</style>
+    @media(max-width:700px){.conf-grid{grid-template-columns:1fr}.doc-grid{grid-template-columns:1fr}header{padding:0 1rem}main{padding:1rem}nav{padding:0 .5rem}}
+  </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="logo">DVS <span>/ Doc Verification</span></div>
   <div class="hdr-right">
@@ -223,7 +209,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </header>
 
-<!-- NAV TABS -->
 <nav>
   <button class="active" onclick="switchTab('upload',this)">⬆ Upload &amp; Verify</button>
   <button onclick="switchTab('sessions',this)">🗂 Sessions</button>
@@ -233,490 +218,730 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 <main>
 
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<!--  TAB 1 · UPLOAD                                                       -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel active" id="tab-upload">
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!--  TAB 1 · UPLOAD & VERIFY                                              -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-upload">
 
-  <!-- Drop zone -->
-  <div class="upload-zone" id="dropZone"
-       onclick="document.getElementById('fileInput').click()"
-       ondragover="onDragOver(event)"
-       ondragleave="onDragLeave()"
-       ondrop="onDrop(event)">
-    <span class="uz-icon">📂</span>
-    <div class="uz-title">Drop documents here or click to browse</div>
-    <div class="uz-sub">PDF · JPG · PNG · TIFF &nbsp;|&nbsp; max 50 MB each &nbsp;|&nbsp; up to 10 files</div>
-  </div>
-  <input type="file" id="fileInput" multiple
-         accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif"
-         onchange="onFileSelect(event)"/>
-
-  <!-- Queued file list -->
-  <div class="file-list" id="fileList"></div>
-
-  <!-- Progress -->
-  <div class="progress-wrap" id="progressWrap">
-    <div class="prog-meta">
-      <span id="progText">Processing…</span>
-      <span id="progPct">0%</span>
-    </div>
-    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
-  </div>
-
-  <!-- Actions -->
-  <div class="action-bar">
-    <button class="btn-primary" id="verifyBtn" onclick="runVerification()" disabled>▶ Run Verification</button>
-    <button class="btn-ghost" onclick="clearAll()">✕ Clear</button>
-  </div>
-
-  <!-- ── RESULTS ────────────────────────────────────────────────────── -->
-  <div class="result-section" id="resultSection">
-
-    <!-- Header row -->
-    <div class="result-hdr">
-      <div class="result-title">Verification Results</div>
-      <div id="overallBadge"></div>
-    </div>
-
-    <!-- Confidence row -->
-    <div class="conf-grid">
-
-      <!-- Gauge -->
-      <div class="conf-card">
-        <div class="gauge-wrap">
-          <svg class="gauge-svg" viewBox="0 0 84 84">
-            <circle cx="42" cy="42" r="36" fill="none" stroke="var(--border)" stroke-width="7"/>
-            <circle cx="42" cy="42" r="36" fill="none" stroke="var(--accent)" stroke-width="7"
-              stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"
-              id="gaugeCircle" transform="rotate(-90 42 42)"
-              style="transition:stroke-dashoffset 1s ease,stroke .5s ease"/>
-          </svg>
+    <!-- Mode selector -->
+    <div style="margin-bottom:1.4rem">
+      <div style="font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem">Upload Mode</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;max-width:660px">
+        <div class="mode-card active" id="mode-folder" onclick="setMode('folder')">
+          <div class="mode-icon">📁</div>
+          <div>
+            <div class="mode-title">Folder Upload</div>
+            <div class="mode-sub">One folder = one person</div>
+          </div>
         </div>
-        <div class="conf-val" id="confVal" style="color:var(--accent)">—</div>
-        <div class="conf-label">Overall Confidence</div>
+        <div class="mode-card" id="mode-bulk" onclick="setMode('bulk')">
+          <div class="mode-icon">🗂</div>
+          <div>
+            <div class="mode-title">Bulk Folders</div>
+            <div class="mode-sub">Parent folder with subfolders</div>
+          </div>
+        </div>
       </div>
-
-      <!-- Face score -->
-      <div class="conf-card">
-        <div class="conf-val" id="faceVal" style="color:var(--accent2)">—</div>
-        <div class="conf-label">Face Match Score</div>
-      </div>
-
-      <!-- Doc count + time -->
-      <div class="conf-card">
-        <div class="conf-val" id="docCountVal" style="color:var(--text)">—</div>
-        <div class="conf-label">Docs Processed</div>
-        <div style="margin-top:.5rem;font-family:var(--mono);font-size:.68rem;color:var(--muted)" id="timeVal"></div>
-      </div>
-
     </div>
 
-    <!-- Match scores -->
-    <div class="card" id="matchCard">
-      <div class="card-hdr"><span class="card-title">Cross-Document Match Scores</span></div>
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!--  SECTION A: FOLDER UPLOAD (single person)                       -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="section-folder">
+
+      <div class="upload-zone" id="dropZone"
+           onclick="document.getElementById('fileInput').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <span class="uz-icon">📂</span>
+        <div class="uz-title">Drop folder here or click to browse</div>
+        <div class="uz-sub">All files inside treated as one verification session</div>
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">
+          <span class="fmt-pill">PDF</span><span class="fmt-pill">JPG</span>
+          <span class="fmt-pill">PNG</span><span class="fmt-pill">TIFF</span>
+          <span class="fmt-pill">Max 50 MB/file</span>
+        </div>
+      </div>
+      <input type="file" id="fileInput" multiple webkitdirectory
+             onchange="onFolderSelect(event)" style="display:none"/>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="prog-meta"><span id="progText">Processing…</span><span id="progPct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-primary" id="verifyBtn" onclick="runVerification()" disabled>▶ Run Verification</button>
+        <button class="btn-ghost" onclick="clearAll()">✕ Clear</button>
+      </div>
+
+      <!-- Single-session results -->
+      <div class="result-section" id="resultSection">
+        <div class="result-hdr">
+          <div class="result-title">Verification Results</div>
+          <div id="overallBadge"></div>
+        </div>
+        <div class="conf-grid">
+          <div class="conf-card">
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 84 84">
+                <circle cx="42" cy="42" r="36" fill="none" stroke="var(--border)" stroke-width="7"/>
+                <circle cx="42" cy="42" r="36" fill="none" stroke="var(--accent)" stroke-width="7"
+                        stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"
+                        id="gaugeCircle" transform="rotate(-90 42 42)"
+                        style="transition:stroke-dashoffset 1s ease,stroke .5s ease"/>
+              </svg>
+            </div>
+            <div class="conf-val" id="confVal" style="color:var(--accent)">—</div>
+            <div class="conf-label">Overall Confidence</div>
+          </div>
+          <div class="conf-card">
+            <div class="conf-val" id="faceVal" style="color:var(--accent2)">—</div>
+            <div class="conf-label">Face Match Score</div>
+          </div>
+          <div class="conf-card">
+            <div class="conf-val" id="docCountVal" style="color:var(--text)">—</div>
+            <div class="conf-label">Docs Processed</div>
+            <div style="margin-top:.5rem;font-family:var(--mono);font-size:.68rem;color:var(--muted)" id="timeVal"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-title">Cross-Document Match Scores</span></div>
+          <table><thead><tr><th>Field / Check</th><th>Score</th><th>Result</th></tr></thead>
+            <tbody id="matchTbody"></tbody></table>
+        </div>
+        <div class="card" id="issuesCard" style="display:none">
+          <div class="card-hdr"><span class="card-title">⚠ Flagged Issues</span></div>
+          <div class="issues-body" id="issuesBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-title">Extracted Document Data</span></div>
+          <div class="doc-grid" id="docGrid"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-title">Session Metadata</span></div>
+          <table><tbody id="sessionMeta"></tbody></table>
+        </div>
+      </div>
+    </div><!-- /section-folder -->
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!--  SECTION B: BULK FOLDERS (multiple people)                      -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div id="section-bulk" style="display:none">
+
+      <div class="upload-zone" id="bulkDropZone"
+           onclick="document.getElementById('bulkInput').click()"
+           ondragover="onBulkDragOver(event)" ondragleave="onBulkDragLeave()" ondrop="onBulkDrop(event)">
+        <span class="uz-icon">🗂</span>
+        <div class="uz-title">Drop parent folder here or click to browse</div>
+        <div class="uz-sub">Each subfolder = one person's verification session</div>
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">
+          <span class="fmt-pill">PDF</span><span class="fmt-pill">JPG</span>
+          <span class="fmt-pill">PNG</span><span class="fmt-pill">TIFF</span>
+          <span class="fmt-pill">Max 50 MB/file</span>
+        </div>
+      </div>
+      <input type="file" id="bulkInput" multiple webkitdirectory
+             onchange="onBulkSelect(event)" style="display:none"/>
+
+      <!-- Subfolder summary list -->
+      <div id="bulkFolderList" style="margin-top:1.25rem;display:flex;flex-direction:column;gap:.45rem"></div>
+
+      <div class="progress-wrap" id="bulkProgressWrap">
+        <div class="prog-meta"><span id="bulkProgText">Processing sessions…</span><span id="bulkProgPct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="bulkProgFill"></div></div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-primary" id="bulkVerifyBtn" onclick="runBulkVerification()" disabled>▶ Run Bulk Verification</button>
+        <button class="btn-ghost" onclick="clearBulk()">✕ Clear</button>
+      </div>
+
+      <!-- Bulk results accordion -->
+      <div id="bulkResultsList" style="margin-top:1.5rem"></div>
+    </div><!-- /section-bulk -->
+
+  </div><!-- /tab-upload -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!--  TAB 2 · SESSIONS                                                     -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-sessions">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem">
+      <h2 style="font-size:1.2rem;font-weight:700">Verification Sessions</h2>
+      <button class="btn-ghost" onclick="loadSessions()">↻ Refresh</button>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Recent Sessions (last 50)</span></div>
+      <div id="sessionsBody">
+        <div style="padding:2rem;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--muted)">No sessions yet — run a verification first.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!--  TAB 3 · ANALYTICS                                                    -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-stats">
+    <div style="margin-bottom:1.4rem">
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:.3rem">Analytics Dashboard</h2>
+      <p style="font-family:var(--mono);font-size:.73rem;color:var(--muted)">System-wide verification statistics</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="st-total">—</div><div class="stat-label">Total Sessions</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-verified" style="color:var(--accent)">—</div><div class="stat-label">Verified</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-partial" style="color:var(--warn)">—</div><div class="stat-label">Partial</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-failed" style="color:var(--danger)">—</div><div class="stat-label">Failed</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-docs">—</div><div class="stat-label">Docs Processed</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-conf">—</div><div class="stat-label">Avg Confidence</div></div>
+    </div>
+    <button class="btn-ghost" onclick="loadStats()">↻ Refresh Stats</button>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!--  TAB 4 · API DOCS                                                     -->
+  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-docs">
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1.4rem">API Reference</h2>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-hdr"><span class="card-title">Base URL: /api/v1</span></div>
       <table>
-        <thead><tr><th>Field / Check</th><th>Score</th><th>Result</th></tr></thead>
-        <tbody id="matchTbody"></tbody>
-      </table>
-    </div>
-
-    <!-- Issues (hidden when none) -->
-    <div class="card" id="issuesCard" style="display:none">
-      <div class="card-hdr"><span class="card-title">⚠ Flagged Issues</span></div>
-      <div class="issues-body" id="issuesBody"></div>
-    </div>
-
-    <!-- Extracted document data -->
-    <div class="card">
-      <div class="card-hdr"><span class="card-title">Extracted Document Data</span></div>
-      <div class="doc-grid" id="docGrid"></div>
-    </div>
-
-    <!-- Session metadata -->
-    <div class="card">
-      <div class="card-hdr"><span class="card-title">Session Metadata</span></div>
-      <table><tbody id="sessionMeta"></tbody></table>
-    </div>
-
-  </div><!-- /result-section -->
-</div><!-- /tab-upload -->
-
-
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<!--  TAB 2 · SESSIONS                                                     -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-sessions">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem">
-    <h2 style="font-size:1.2rem;font-weight:700">Verification Sessions</h2>
-    <button class="btn-ghost" onclick="loadSessions()">↻ Refresh</button>
-  </div>
-  <div class="card">
-    <div class="card-hdr"><span class="card-title">Recent Sessions (last 50)</span></div>
-    <div id="sessionsBody">
-      <div style="padding:2rem;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--muted)">
-        No sessions yet — run a verification first.
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<!--  TAB 3 · ANALYTICS                                                    -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-stats">
-  <div style="margin-bottom:1.4rem">
-    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:.3rem">Analytics Dashboard</h2>
-    <p style="font-family:var(--mono);font-size:.73rem;color:var(--muted)">System-wide verification statistics</p>
-  </div>
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-val" id="st-total">—</div><div class="stat-label">Total Sessions</div></div>
-    <div class="stat-card"><div class="stat-val" id="st-verified" style="color:var(--accent)">—</div><div class="stat-label">Verified</div></div>
-    <div class="stat-card"><div class="stat-val" id="st-partial" style="color:var(--warn)">—</div><div class="stat-label">Partial</div></div>
-    <div class="stat-card"><div class="stat-val" id="st-failed" style="color:var(--danger)">—</div><div class="stat-label">Failed</div></div>
-    <div class="stat-card"><div class="stat-val" id="st-docs">—</div><div class="stat-label">Docs Processed</div></div>
-    <div class="stat-card"><div class="stat-val" id="st-conf">—</div><div class="stat-label">Avg Confidence</div></div>
-  </div>
-  <button class="btn-ghost" onclick="loadStats()">↻ Refresh Stats</button>
-</div>
-
-
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<!--  TAB 4 · API DOCS                                                     -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-docs">
-  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1.4rem">API Reference</h2>
-
-  <div class="card" style="margin-bottom:1rem">
-    <div class="card-hdr"><span class="card-title">Base URL: /api/v1</span></div>
-    <table>
-      <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
-      <tbody>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
+        <tbody>
         <tr><td><span class="method-badge m-post">POST</span></td><td>/verify/upload</td><td>Upload &amp; verify 1–10 documents</td></tr>
         <tr><td><span class="method-badge m-get">GET</span></td><td>/verify/{session_id}</td><td>Retrieve result by session ID</td></tr>
         <tr><td><span class="method-badge m-get">GET</span></td><td>/sessions</td><td>List all sessions (last 50)</td></tr>
         <tr><td><span class="method-badge m-del">DELETE</span></td><td>/sessions/{session_id}</td><td>Delete a session</td></tr>
         <tr><td><span class="method-badge m-get">GET</span></td><td>/stats</td><td>System-level analytics</td></tr>
         <tr><td><span class="method-badge m-get">GET</span></td><td>/health</td><td>Health check</td></tr>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <a href="/api/docs" target="_blank" class="btn-primary" style="text-decoration:none">⚡ Open Swagger UI</a>
+    </div>
   </div>
-
-  <div class="card" style="margin-bottom:1rem">
-    <div class="card-hdr"><span class="card-title">Supported Document Types</span></div>
-    <table>
-      <thead><tr><th>Type</th><th>Extracted Fields</th><th>Avg OCR Confidence</th></tr></thead>
-      <tbody>
-        <tr><td>🛂 Passport</td><td>Full name, nationality, DOB, expiry, MRZ lines</td><td><span class="badge success">&gt;97%</span></td></tr>
-        <tr><td>🚗 Driver's License</td><td>Name, address, DOB, license no., expiry, class</td><td><span class="badge success">&gt;95%</span></td></tr>
-        <tr><td>🪪 National ID</td><td>Name, DOB, ID number, address</td><td><span class="badge success">&gt;95%</span></td></tr>
-        <tr><td>✈ Visa</td><td>Holder name, validity dates, visa type, entry type</td><td><span class="badge warning">&gt;92%</span></td></tr>
-        <tr><td>💡 Utility Bill</td><td>Account name, address, account no., dates, amount</td><td><span class="badge warning">&gt;90%</span></td></tr>
-        <tr><td>🏦 Bank Statement</td><td>Account holder, account no., address, period, bank</td><td><span class="badge warning">&gt;90%</span></td></tr>
-        <tr><td>💼 Employment Doc</td><td>Employee, employer, designation, joining date, salary</td><td><span class="badge warning">&gt;90%</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div style="text-align:center;margin-top:1.5rem">
-    <a href="/api/docs" target="_blank" class="btn-primary" style="text-decoration:none">
-      ⚡ Open Interactive Swagger UI
-    </a>
-  </div>
-</div>
 
 </main>
 
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<!--  JAVASCRIPT                                                            -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
 <script>
-const API = '/api/v1';
-let selectedFiles = [];
+  const API = '/api/v1';
 
-/* ── Tab switching ─────────────────────────────────────────────────────── */
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-  if (name === 'sessions') loadSessions();
-  if (name === 'stats')    loadStats();
-}
+  // ══════════════════════════════════════════════════════════════════════════
+  //  TABS
+  // ══════════════════════════════════════════════════════════════════════════
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+    if (name === 'sessions') loadSessions();
+    if (name === 'stats')    loadStats();
+  }
 
-/* ── Drag & drop ───────────────────────────────────────────────────────── */
-function onDragOver(e)  { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
-function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
-function onDrop(e) {
-  e.preventDefault();
-  document.getElementById('dropZone').classList.remove('drag-over');
-  addFiles(Array.from(e.dataTransfer.files));
-}
-function onFileSelect(e) { addFiles(Array.from(e.target.files)); }
+  // ══════════════════════════════════════════════════════════════════════════
+  //  MODE SWITCHING
+  // ══════════════════════════════════════════════════════════════════════════
+  let currentMode = 'folder';
 
-function addFiles(newFiles) {
-  newFiles.forEach(f => {
-    if (selectedFiles.length >= 10) { toast('Maximum 10 files allowed.', 'error'); return; }
-    if (!selectedFiles.find(x => x.name === f.name && x.size === f.size)) selectedFiles.push(f);
-  });
-  renderFileList();
-}
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-folder').classList.toggle('active', mode === 'folder');
+    document.getElementById('mode-bulk').classList.toggle('active',  mode === 'bulk');
+    document.getElementById('section-folder').style.display = mode === 'folder' ? 'block' : 'none';
+    document.getElementById('section-bulk').style.display   = mode === 'bulk'   ? 'block' : 'none';
+  }
 
-function renderFileList() {
+  // ══════════════════════════════════════════════════════════════════════════
+  //  MODE A: FOLDER UPLOAD (single person)
+  // ══════════════════════════════════════════════════════════════════════════
+  let selectedFiles = [];
+
   const EXT_ICON = { pdf:'📄', jpg:'🖼', jpeg:'🖼', png:'🖼', tiff:'📋', tif:'📋' };
-  const list = document.getElementById('fileList');
-  list.innerHTML = selectedFiles.map((f, i) => {
-    const ext  = f.name.split('.').pop().toLowerCase();
-    const icon = EXT_ICON[ext] || '📁';
-    const size = f.size < 1048576
-      ? `${(f.size/1024).toFixed(1)} KB`
-      : `${(f.size/1048576).toFixed(1)} MB`;
-    return `<div class="file-chip">
+  const ALLOWED  = new Set(['pdf','jpg','jpeg','png','tiff','tif']);
+
+  function fmtSize(b) {
+    return b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
+  }
+
+  // Drag & drop for folder mode
+  function onDragOver(e)  { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+  function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-over');
+    const items = e.dataTransfer.items;
+    const files = [];
+    if (items) {
+      for (const item of items) {
+        const f = item.getAsFile();
+        if (f) files.push(f);
+      }
+    } else {
+      files.push(...Array.from(e.dataTransfer.files));
+    }
+    addFiles(files);
+  }
+
+  function onFolderSelect(e) { addFiles(Array.from(e.target.files)); }
+
+  function addFiles(newFiles) {
+    const validFiles = newFiles.filter(f => {
+      const ext = f.name.split('.').pop().toLowerCase();
+      return ALLOWED.has(ext);
+    });
+    if (validFiles.length === 0) { toast('No supported files found (PDF, JPG, PNG, TIFF).', 'error'); return; }
+    validFiles.forEach(f => {
+      if (selectedFiles.length >= 10) { toast('Maximum 10 files per session.', 'error'); return; }
+      if (!selectedFiles.find(x => x.name === f.name && x.size === f.size)) selectedFiles.push(f);
+    });
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = selectedFiles.map((f, i) => {
+      const ext  = f.name.split('.').pop().toLowerCase();
+      const icon = EXT_ICON[ext] || '📁';
+      return `<div class="file-chip">
       <span class="chip-icon">${icon}</span>
       <span class="chip-name">${f.name}</span>
-      <span class="chip-size">${size}</span>
+      <span class="chip-size">${fmtSize(f.size)}</span>
       <button class="chip-rm" onclick="removeFile(${i})" title="Remove">✕</button>
     </div>`;
-  }).join('');
-  document.getElementById('verifyBtn').disabled = selectedFiles.length === 0;
-}
+    }).join('');
+    document.getElementById('verifyBtn').disabled = selectedFiles.length === 0;
+  }
 
-function removeFile(i) { selectedFiles.splice(i, 1); renderFileList(); }
+  function removeFile(i) { selectedFiles.splice(i, 1); renderFileList(); }
 
-function clearAll() {
-  selectedFiles = [];
-  renderFileList();
-  document.getElementById('resultSection').style.display = 'none';
-  document.getElementById('fileInput').value = '';
-}
+  function clearAll() {
+    selectedFiles = [];
+    renderFileList();
+    document.getElementById('resultSection').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('progressWrap').style.display = 'none';
+  }
 
-/* ── Verification ──────────────────────────────────────────────────────── */
-async function runVerification() {
-  if (!selectedFiles.length) return;
+  // ── Run single-session verification ───────────────────────────────────────
+  async function runVerification() {
+    if (!selectedFiles.length) return;
+    const btn   = document.getElementById('verifyBtn');
+    const pw    = document.getElementById('progressWrap');
+    const fill  = document.getElementById('progFill');
+    const pct   = document.getElementById('progPct');
+    const ptxt  = document.getElementById('progText');
 
-  const btn   = document.getElementById('verifyBtn');
-  const pw    = document.getElementById('progressWrap');
-  const fill  = document.getElementById('progFill');
-  const pct   = document.getElementById('progPct');
-  const ptxt  = document.getElementById('progText');
+    btn.disabled    = true;
+    btn.textContent = '⏳ Processing…';
+    pw.style.display = 'block';
+    document.getElementById('resultSection').style.display = 'none';
 
-  btn.disabled  = true;
-  btn.textContent = '⏳ Processing…';
-  pw.style.display = 'block';
-  document.getElementById('resultSection').style.display = 'none';
+    const steps = ['Validating files…','Preprocessing images…','Classifying documents…','Running OCR…','Matching identities…','Finalising…'];
+    let prog = 0;
+    const ticker = setInterval(() => {
+      prog = Math.min(prog + Math.random() * 10, 90);
+      fill.style.width = prog + '%';
+      pct.textContent  = Math.round(prog) + '%';
+      ptxt.textContent = steps[Math.min(Math.floor(prog / 16), steps.length - 1)];
+    }, 300);
 
-  const steps = [
-    'Validating files…',
-    'Preprocessing images…',
-    'Classifying documents…',
-    'Running OCR extraction…',
-    'Matching identities…',
-    'Scoring biometrics…',
-    'Finalising results…',
-  ];
-  let prog = 0;
-  const ticker = setInterval(() => {
-    prog = Math.min(prog + Math.random() * 10, 90);
-    fill.style.width = prog + '%';
-    pct.textContent  = Math.round(prog) + '%';
-    ptxt.textContent = steps[Math.min(Math.floor(prog / 14), steps.length - 1)];
-  }, 300);
+    try {
+      const form = new FormData();
+      selectedFiles.forEach(f => form.append('files', f));
+      const res  = await fetch(`${API}/verify/upload`, { method:'POST', body:form });
+      const json = await res.json();
+      clearInterval(ticker);
+      fill.style.width = '100%'; pct.textContent = '100%';
+      if (!res.ok || !json.success) throw new Error(json.detail || json.message);
+      setTimeout(() => { pw.style.display = 'none'; renderResults(json.data); toast('Verification complete!', 'success'); }, 400);
+    } catch(err) {
+      clearInterval(ticker);
+      pw.style.display = 'none';
+      toast('Error: ' + err.message, 'error');
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = '▶ Run Verification';
+    }
+  }
 
-  try {
-    const form = new FormData();
-    selectedFiles.forEach(f => form.append('files', f));
+  // ══════════════════════════════════════════════════════════════════════════
+  //  MODE B: BULK FOLDERS (multiple people)
+  // ══════════════════════════════════════════════════════════════════════════
 
-    const res  = await fetch(`${API}/verify/upload`, { method:'POST', body:form });
-    const json = await res.json();
+  // Map of folderName → File[]
+  let bulkFolders = {};
 
-    clearInterval(ticker);
+  function onBulkDragOver(e)  { e.preventDefault(); document.getElementById('bulkDropZone').classList.add('drag-over'); }
+  function onBulkDragLeave()  { document.getElementById('bulkDropZone').classList.remove('drag-over'); }
+  function onBulkDrop(e) {
+    e.preventDefault();
+    document.getElementById('bulkDropZone').classList.remove('drag-over');
+    // webkitdirectory drag not fully supported — fall back to files
+    const files = Array.from(e.dataTransfer.files);
+    processBulkFiles(files);
+  }
+  function onBulkSelect(e) { processBulkFiles(Array.from(e.target.files)); }
+
+  function processBulkFiles(files) {
+    // Group by first folder segment in webkitRelativePath
+    bulkFolders = {};
+    files.forEach(f => {
+      const parts  = (f.webkitRelativePath || f.name).split('/');
+      // parts[0] = parent folder, parts[1] = subfolder, parts[2] = file
+      // If structure is: parent/subfolder/file.pdf → key = parts[1]
+      // If flat: parent/file.pdf → key = parts[0] (person name as folder)
+      const key = parts.length >= 3 ? parts[1] : parts[0];
+      const ext  = f.name.split('.').pop().toLowerCase();
+      if (!ALLOWED.has(ext)) return;
+      if (!bulkFolders[key]) bulkFolders[key] = [];
+      bulkFolders[key].push(f);
+    });
+
+    // Remove empty/root
+    Object.keys(bulkFolders).forEach(k => {
+      if (bulkFolders[k].length === 0) delete bulkFolders[k];
+    });
+
+    renderBulkFolderList();
+  }
+
+  function renderBulkFolderList() {
+    const list = document.getElementById('bulkFolderList');
+    const keys  = Object.keys(bulkFolders);
+    if (keys.length === 0) {
+      list.innerHTML = '';
+      document.getElementById('bulkVerifyBtn').disabled = true;
+      return;
+    }
+    list.innerHTML = keys.map((folder, i) => {
+      const count = bulkFolders[folder].length;
+      return `<div class="folder-row" id="frow-${i}">
+      <span style="font-size:1.2rem">📁</span>
+      <span class="fr-name">${folder}</span>
+      <span class="fr-count">${count} file${count !== 1 ? 's' : ''}</span>
+      <span class="fr-status" id="fstatus-${i}"><span class="badge info">Queued</span></span>
+      <button class="folder-rm" onclick="removeBulkFolder('${folder}')" title="Remove">✕</button>
+    </div>`;
+    }).join('');
+    document.getElementById('bulkVerifyBtn').disabled = keys.length === 0;
+  }
+
+  function removeBulkFolder(name) {
+    delete bulkFolders[name];
+    renderBulkFolderList();
+  }
+
+  function clearBulk() {
+    bulkFolders = {};
+    renderBulkFolderList();
+    document.getElementById('bulkResultsList').innerHTML = '';
+    document.getElementById('bulkProgressWrap').style.display = 'none';
+    document.getElementById('bulkInput').value = '';
+  }
+
+  // ── Run bulk verification (sequential sessions) ────────────────────────
+  async function runBulkVerification() {
+    const folders = Object.keys(bulkFolders);
+    if (!folders.length) return;
+
+    const btn  = document.getElementById('bulkVerifyBtn');
+    const pw   = document.getElementById('bulkProgressWrap');
+    const fill = document.getElementById('bulkProgFill');
+    const pct  = document.getElementById('bulkProgPct');
+    const ptxt = document.getElementById('bulkProgText');
+
+    btn.disabled    = true;
+    btn.textContent = '⏳ Processing…';
+    pw.style.display = 'block';
+    document.getElementById('bulkResultsList').innerHTML = '';
+
+    let completed = 0;
+    const results = [];
+
+    for (let i = 0; i < folders.length; i++) {
+      const folderName = folders[i];
+      const files      = bulkFolders[folderName];
+
+      // Update status badge
+      const fstatus = document.getElementById(`fstatus-${i}`);
+      if (fstatus) fstatus.innerHTML = '<span class="badge info">⟳ Processing…</span>';
+
+      // Update progress bar
+      const progress = Math.round((i / folders.length) * 100);
+      fill.style.width = progress + '%';
+      pct.textContent  = progress + '%';
+      ptxt.textContent = `Processing ${i + 1} of ${folders.length}: ${folderName}`;
+
+      try {
+        const form = new FormData();
+        files.forEach(f => form.append('files', f));
+        const res  = await fetch(`${API}/verify/upload`, { method:'POST', body:form });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) throw new Error(json.detail || json.message);
+
+        results.push({ folderName, data: json.data, error: null });
+        completed++;
+        if (fstatus) {
+          const s = json.data.status;
+          const cls = s === 'verified' ? 'success' : s === 'partial' ? 'warning' : 'danger';
+          const lbl = s === 'verified' ? '✓ Verified' : s === 'partial' ? '~ Partial' : '✕ Failed';
+          fstatus.innerHTML = `<span class="badge ${cls}">${lbl}</span>`;
+        }
+      } catch(err) {
+        results.push({ folderName, data: null, error: err.message });
+        if (fstatus) fstatus.innerHTML = '<span class="badge danger">✕ Error</span>';
+      }
+    }
+
     fill.style.width = '100%';
     pct.textContent  = '100%';
+    ptxt.textContent = `Done — ${completed} of ${folders.length} sessions completed`;
 
-    if (!res.ok || !json.success) throw new Error(json.detail || json.message || 'Verification failed.');
+    renderBulkResults(results);
+    toast(`Bulk complete: ${completed}/${folders.length} sessions verified.`, completed === folders.length ? 'success' : 'info');
 
-    setTimeout(() => {
-      pw.style.display = 'none';
-      renderResults(json.data);
-      toast('Verification complete!', 'success');
-    }, 400);
-
-  } catch (err) {
-    clearInterval(ticker);
-    pw.style.display = 'none';
-    toast('Error: ' + err.message, 'error');
-  } finally {
     btn.disabled    = false;
-    btn.textContent = '▶ Run Verification';
+    btn.textContent = '▶ Run Bulk Verification';
   }
-}
 
-/* ── Render results ────────────────────────────────────────────────────── */
-function renderResults(data) {
-  const sec = document.getElementById('resultSection');
-  sec.style.display = 'block';
-  setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  function renderBulkResults(results) {
+    const container = document.getElementById('bulkResultsList');
+    container.innerHTML = `
+    <div style="font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem">
+      Bulk Results — ${results.length} Sessions
+    </div>`;
 
-  // Badge
-  const STATUS_MAP = {
-    verified: ['success', '✓ VERIFIED'],
-    partial:  ['warning', '~ PARTIAL'],
-    failed:   ['danger',  '✕ FAILED'],
-  };
-  const [cls, label] = STATUS_MAP[data.status] || ['info', data.status.toUpperCase()];
-  document.getElementById('overallBadge').innerHTML = `<span class="badge ${cls}">${label}</span>`;
+    results.forEach((r, idx) => {
+      const div = document.createElement('div');
+      div.className = 'bulk-session';
 
-  // Gauge
-  const conf = data.overall_confidence;
-  const pct  = Math.round(conf * 100);
-  document.getElementById('confVal').textContent = pct + '%';
-  const circle = document.getElementById('gaugeCircle');
-  circle.style.strokeDashoffset = 226.2 - 226.2 * conf;
-  circle.style.stroke = conf >= .75 ? 'var(--accent)' : conf >= .50 ? 'var(--warn)' : 'var(--danger)';
-  document.getElementById('confVal').style.color = conf >= .75 ? 'var(--accent)' : conf >= .50 ? 'var(--warn)' : 'var(--danger)';
+      if (r.error || !r.data) {
+        div.innerHTML = `
+        <div class="bulk-session-hdr">
+          <span style="font-size:1.1rem">📁</span>
+          <span class="bsh-folder">${r.folderName}</span>
+          <span class="badge danger">✕ Error</span>
+          <span class="bsh-meta">${r.error || 'Unknown error'}</span>
+        </div>`;
+      } else {
+        const d    = r.data;
+        const conf = Math.round(d.overall_confidence * 100);
+        const STATUS_MAP = { verified:['success','✓ Verified'], partial:['warning','~ Partial'], failed:['danger','✕ Failed'] };
+        const [cls, lbl] = STATUS_MAP[d.status] || ['info', d.status];
 
-  // Face & doc count
-  document.getElementById('faceVal').textContent  = data.face_match_score !== null && data.face_match_score !== undefined
-    ? Math.round(data.face_match_score * 100) + '%' : 'N/A';
-  document.getElementById('docCountVal').textContent = data.documents.length;
-  document.getElementById('timeVal').textContent     = `⏱ ${data.total_processing_time_ms} ms`;
-
-  // Match scores table
-  const tbody = document.getElementById('matchTbody');
-  tbody.innerHTML = '';
-  (data.match_scores || []).forEach(m => {
-    const color = m.score >= .75 ? 'var(--accent)' : m.score >= .50 ? 'var(--warn)' : 'var(--danger)';
-    const p     = Math.round(m.score * 100);
-    tbody.innerHTML += `<tr>
-      <td>${m.field}</td>
-      <td>
-        <div class="sbar-wrap">
-          <div class="sbar-track"><div class="sbar-fill" style="width:${p}%;background:${color}"></div></div>
-          <span class="sbar-pct" style="color:${color}">${p}%</span>
+        div.innerHTML = `
+        <div class="bulk-session-hdr" onclick="toggleBulkSession(${idx})">
+          <span style="font-size:1.1rem">📁</span>
+          <span class="bsh-folder">${r.folderName}</span>
+          <span class="badge ${cls}">${lbl}</span>
+          <span class="bsh-meta">${conf}% confidence · ${d.documents.length} doc${d.documents.length !== 1 ? 's':''} · ${d.total_processing_time_ms}ms</span>
+          <span class="bsh-chevron" id="chev-${idx}">▼</span>
         </div>
-      </td>
-      <td><span class="badge ${m.matched ? 'success':'danger'}">${m.matched ? '✓ Match':'✕ Fail'}</span></td>
+        <div class="bulk-session-body" id="body-${idx}">
+          <div id="body-content-${idx}"></div>
+        </div>`;
+      }
+      container.appendChild(div);
+      // Pre-render body content
+      if (r.data) renderSessionBody(`body-content-${idx}`, r.data);
+    });
+  }
+
+  function toggleBulkSession(idx) {
+    const body = document.getElementById(`body-${idx}`);
+    const chev = document.getElementById(`chev-${idx}`);
+    const open = body.classList.toggle('open');
+    chev.classList.toggle('open', open);
+  }
+
+  function renderSessionBody(containerId, data) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    // Match scores mini table
+    const scoresHtml = (data.match_scores || []).map(m => {
+      const color = m.score >= .75 ? 'var(--accent)' : m.score >= .5 ? 'var(--warn)' : 'var(--danger)';
+      const p = Math.round(m.score * 100);
+      return `<tr>
+      <td>${m.field}</td>
+      <td><div class="sbar-wrap"><div class="sbar-track"><div class="sbar-fill" style="width:${p}%;background:${color}"></div></div><span class="sbar-pct" style="color:${color}">${p}%</span></div></td>
+      <td><span class="badge ${m.matched ? 'success':'danger'}">${m.matched ? '✓':'✕'}</span></td>
     </tr>`;
-  });
-  if (!data.match_scores?.length) {
-    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--muted)">No cross-match data available.</td></tr>';
-  }
+    }).join('') || '<tr><td colspan="3" style="color:var(--muted)">No match data</td></tr>';
 
-  // Issues
-  const ic = document.getElementById('issuesCard');
-  const ib = document.getElementById('issuesBody');
-  if (data.issues?.length) {
-    ic.style.display = 'block';
-    ib.innerHTML     = data.issues.map(i => `<div class="issue-item">⚠ ${i}</div>`).join('');
-  } else {
-    ic.style.display = 'none';
-  }
+    // Issues
+    const issuesHtml = (data.issues || []).length
+            ? `<div style="margin-top:.75rem">${data.issues.map(i => `<div class="issue-item">⚠ ${i}</div>`).join('')}</div>`
+            : '';
 
-  // Document cards
-  const TYPE_ICON = {
-    passport:'🛂', drivers_license:'🚗', national_id:'🪪', visa:'✈',
-    utility_bill:'💡', bank_statement:'🏦', employment_doc:'💼', unknown:'📄',
-  };
-  const grid = document.getElementById('docGrid');
-  grid.innerHTML = '';
-  (data.documents || []).forEach(doc => {
-    const icon     = TYPE_ICON[doc.document_type] || '📄';
-    const typeName = doc.document_type.replace(/_/g,' ').toUpperCase();
-    const faceTag  = doc.has_face ? `<span class="badge info" style="font-size:.6rem;margin-left:auto">👤 Face</span>` : '';
-    const fields   = (doc.extracted_fields || []).map(f => `
-      <div class="field-row">
+    // Doc cards
+    const TYPE_ICON = { passport:'🛂',drivers_license:'🚗',national_id:'🪪',visa:'✈',utility_bill:'💡',bank_statement:'🏦',employment_doc:'💼',unknown:'📄' };
+    const docCards = (data.documents || []).map(doc => {
+      const icon     = TYPE_ICON[doc.document_type] || '📄';
+      const typeName = doc.document_type.replace(/_/g,' ').toUpperCase();
+      const fields   = (doc.extracted_fields || []).map(f =>
+              `<div class="field-row">
         <span class="fk">${f.field_name.replace(/_/g,' ')}</span>
         <span class="fv">${f.value||'—'}<span class="conf-pill">${Math.round(f.confidence*100)}%</span></span>
       </div>`).join('');
-    grid.innerHTML += `
-      <div class="doc-card">
-        <div class="doc-card-hdr">
-          <span class="dc-icon">${icon}</span>
-          <div class="dc-info">
-            <div class="dc-name">${doc.filename}</div>
-            <div class="dc-type">${typeName} · ${Math.round(doc.classification_confidence*100)}% conf · ${doc.processing_time_ms}ms</div>
-          </div>
-          ${faceTag}
-        </div>
-        <div class="doc-card-body">
-          ${fields || '<div style="color:var(--muted);font-family:var(--mono);font-size:.75rem">No fields extracted.</div>'}
-        </div>
-      </div>`;
-  });
+      return `<div class="doc-card">
+      <div class="doc-card-hdr"><span class="dc-icon">${icon}</span>
+        <div class="dc-info"><div class="dc-name">${doc.filename}</div>
+        <div class="dc-type">${typeName}</div></div>
+        ${doc.has_face ? '<span class="badge info" style="font-size:.6rem">👤 Face</span>' : ''}
+      </div>
+      <div class="doc-card-body">${fields || '<div style="color:var(--muted);font-family:var(--mono);font-size:.75rem">No fields extracted</div>'}</div>
+    </div>`;
+    }).join('');
 
-  // Session metadata
-  document.getElementById('sessionMeta').innerHTML = `
-    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem;width:180px">Session ID</td>
-        <td style="font-family:var(--mono);font-size:.72rem;color:var(--accent2)">${data.session_id}</td></tr>
-    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Identity Match</td>
-        <td>${data.identity_match ? '<span class="badge success">✓ Yes</span>' : '<span class="badge danger">✕ No</span>'}</td></tr>
-    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Status</td>
-        <td><span class="badge ${cls}">${label}</span></td></tr>
-    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Processing Time</td>
-        <td style="font-family:var(--mono);font-size:.72rem">${data.total_processing_time_ms} ms</td></tr>
-    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Completed At</td>
-        <td style="font-family:var(--mono);font-size:.72rem">${new Date(data.completed_at).toLocaleString()}</td></tr>`;
-}
+    el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div>
+        <div style="font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.07em">Match Scores</div>
+        <table style="font-size:.75rem"><thead><tr><th>Check</th><th>Score</th><th></th></tr></thead>
+        <tbody>${scoresHtml}</tbody></table>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.07em">Session Info</div>
+        <table style="font-size:.75rem"><tbody>
+          <tr><td style="color:var(--muted)">Session ID</td><td style="color:var(--accent2);font-size:.68rem">${data.session_id.substring(0,20)}…</td></tr>
+          <tr><td style="color:var(--muted)">Identity Match</td><td>${data.identity_match ? '<span class="badge success">✓ Yes</span>' : '<span class="badge danger">✕ No</span>'}</td></tr>
+          <tr><td style="color:var(--muted)">Face Score</td><td style="color:var(--accent2)">${data.face_match_score !== null && data.face_match_score !== undefined ? Math.round(data.face_match_score*100)+'%' : 'N/A'}</td></tr>
+          <tr><td style="color:var(--muted)">Processing</td><td>${data.total_processing_time_ms}ms</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    ${issuesHtml}
+    <div style="margin-top:1rem">
+      <div style="font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.07em">Extracted Documents</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem">${docCards}</div>
+    </div>`;
+  }
 
-/* ── Sessions tab ──────────────────────────────────────────────────────── */
-async function loadSessions() {
-  try {
-    const res  = await fetch(`${API}/sessions`);
-    const json = await res.json();
-    const body = document.getElementById('sessionsBody');
-    if (!json.data?.length) {
-      body.innerHTML = '<div style="padding:2rem;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--muted)">No sessions found.</div>';
-      return;
-    }
-    const STATUS_COLOR = { verified:'var(--accent)', partial:'var(--warn)', failed:'var(--danger)' };
-    const STATUS_ICON  = { verified:'✓', partial:'~', failed:'✕', pending:'…', processing:'⟳' };
-    body.innerHTML = json.data.map(s => {
-      const color = STATUS_COLOR[s.status] || 'var(--muted)';
-      const icon  = STATUS_ICON[s.status]  || '?';
-      return `<div class="session-row" onclick="openSession('${s.session_id}')">
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SINGLE SESSION RESULTS RENDERER
+  // ══════════════════════════════════════════════════════════════════════════
+  function renderResults(data) {
+    const sec = document.getElementById('resultSection');
+    sec.style.display = 'block';
+    setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+
+    const STATUS_MAP = { verified:['success','✓ VERIFIED'], partial:['warning','~ PARTIAL'], failed:['danger','✕ FAILED'] };
+    const [cls, label] = STATUS_MAP[data.status] || ['info', data.status.toUpperCase()];
+    document.getElementById('overallBadge').innerHTML = `<span class="badge ${cls}">${label}</span>`;
+
+    const conf = data.overall_confidence;
+    document.getElementById('confVal').textContent = Math.round(conf * 100) + '%';
+    document.getElementById('confVal').style.color = conf >= .75 ? 'var(--accent)' : conf >= .5 ? 'var(--warn)' : 'var(--danger)';
+    const circle = document.getElementById('gaugeCircle');
+    circle.style.strokeDashoffset = 226.2 - 226.2 * conf;
+    circle.style.stroke = conf >= .75 ? 'var(--accent)' : conf >= .5 ? 'var(--warn)' : 'var(--danger)';
+    document.getElementById('faceVal').textContent = data.face_match_score != null ? Math.round(data.face_match_score * 100) + '%' : 'N/A';
+    document.getElementById('docCountVal').textContent = data.documents.length;
+    document.getElementById('timeVal').textContent = `⏱ ${data.total_processing_time_ms} ms`;
+
+    const tbody = document.getElementById('matchTbody');
+    tbody.innerHTML = (data.match_scores || []).map(m => {
+      const color = m.score >= .75 ? 'var(--accent)' : m.score >= .5 ? 'var(--warn)' : 'var(--danger)';
+      const p = Math.round(m.score * 100);
+      return `<tr><td>${m.field}</td>
+      <td><div class="sbar-wrap"><div class="sbar-track"><div class="sbar-fill" style="width:${p}%;background:${color}"></div></div><span class="sbar-pct" style="color:${color}">${p}%</span></div></td>
+      <td><span class="badge ${m.matched ? 'success':'danger'}">${m.matched ? '✓ Match':'✕ Fail'}</span></td></tr>`;
+    }).join('') || '<tr><td colspan="3" style="color:var(--muted)">No cross-match data available.</td></tr>';
+
+    const ic = document.getElementById('issuesCard');
+    const ib = document.getElementById('issuesBody');
+    if (data.issues?.length) { ic.style.display='block'; ib.innerHTML=data.issues.map(i=>`<div class="issue-item">⚠ ${i}</div>`).join(''); }
+    else ic.style.display='none';
+
+    const TYPE_ICON = { passport:'🛂',drivers_license:'🚗',national_id:'🪪',visa:'✈',utility_bill:'💡',bank_statement:'🏦',employment_doc:'💼',unknown:'📄' };
+    const grid = document.getElementById('docGrid');
+    grid.innerHTML = (data.documents || []).map(doc => {
+      const icon=TYPE_ICON[doc.document_type]||'📄';
+      const typeName=doc.document_type.replace(/_/g,' ').toUpperCase();
+      const fields=(doc.extracted_fields||[]).map(f=>
+              `<div class="field-row"><span class="fk">${f.field_name.replace(/_/g,' ')}</span>
+       <span class="fv">${f.value||'—'}<span class="conf-pill">${Math.round(f.confidence*100)}%</span></span></div>`).join('');
+      return `<div class="doc-card">
+      <div class="doc-card-hdr"><span class="dc-icon">${icon}</span>
+        <div class="dc-info"><div class="dc-name">${doc.filename}</div>
+        <div class="dc-type">${typeName} · ${Math.round(doc.classification_confidence*100)}% conf</div></div>
+        ${doc.has_face?'<span class="badge info" style="font-size:.6rem">👤 Face</span>':''}
+      </div>
+      <div class="doc-card-body">${fields||'<div style="color:var(--muted);font-family:var(--mono);font-size:.75rem">No fields extracted.</div>'}</div>
+    </div>`;
+    }).join('');
+
+    document.getElementById('sessionMeta').innerHTML = `
+    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem;width:160px">Session ID</td><td style="font-family:var(--mono);font-size:.72rem;color:var(--accent2)">${data.session_id}</td></tr>
+    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Identity Match</td><td>${data.identity_match?'<span class="badge success">✓ Yes</span>':'<span class="badge danger">✕ No</span>'}</td></tr>
+    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Status</td><td><span class="badge ${cls}">${label}</span></td></tr>
+    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Processing</td><td style="font-family:var(--mono);font-size:.72rem">${data.total_processing_time_ms} ms</td></tr>
+    <tr><td style="color:var(--muted);font-family:var(--mono);font-size:.72rem">Completed At</td><td style="font-family:var(--mono);font-size:.72rem">${new Date(data.completed_at).toLocaleString()}</td></tr>`;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SESSIONS TAB
+  // ══════════════════════════════════════════════════════════════════════════
+  async function loadSessions() {
+    try {
+      const json = await (await fetch(`${API}/sessions`)).json();
+      const body = document.getElementById('sessionsBody');
+      if (!json.data?.length) { body.innerHTML='<div style="padding:2rem;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--muted)">No sessions found.</div>'; return; }
+      const SC = { verified:'var(--accent)', partial:'var(--warn)', failed:'var(--danger)' };
+      const SI = { verified:'✓', partial:'~', failed:'✕', pending:'…', processing:'⟳' };
+      body.innerHTML = json.data.map(s => {
+        const color=SC[s.status]||'var(--muted)', icon=SI[s.status]||'?';
+        return `<div class="session-row" onclick="openSession('${s.session_id}')">
         <span style="color:${color};font-size:.9rem">${icon}</span>
         <span class="s-id">${s.session_id}</span>
-        <span class="s-docs">${s.documents.length} doc${s.documents.length !== 1 ? 's':''}</span>
+        <span class="s-docs">${s.documents.length} docs</span>
         <span class="s-conf" style="color:${color}">${Math.round(s.overall_confidence*100)}%</span>
         <span class="s-time">${new Date(s.created_at).toLocaleTimeString()}</span>
       </div>`;
-    }).join('');
-  } catch(e) { toast('Failed to load sessions.', 'error'); }
-}
+      }).join('');
+    } catch(e) { toast('Failed to load sessions.','error'); }
+  }
 
-function openSession(sid) {
-  // Switch to upload tab and show that session's results
-  switchTab('upload', document.querySelector('nav button'));
-  fetch(`${API}/verify/${sid}`)
-    .then(r => r.json())
-    .then(j => { if (j.success) renderResults(j.data); })
-    .catch(() => toast('Could not load session.', 'error'));
-}
+  function openSession(sid) {
+    setMode('folder');
+    switchTab('upload', document.querySelector('nav button'));
+    fetch(`${API}/verify/${sid}`).then(r=>r.json()).then(j=>{ if(j.success) renderResults(j.data); });
+  }
 
-/* ── Stats tab ─────────────────────────────────────────────────────────── */
-async function loadStats() {
-  try {
-    const res  = await fetch(`${API}/stats`);
-    const json = await res.json();
-    const d    = json.data;
-    document.getElementById('st-total').textContent    = d.total_sessions;
-    document.getElementById('st-verified').textContent = d.verified;
-    document.getElementById('st-partial').textContent  = d.partial;
-    document.getElementById('st-failed').textContent   = d.failed;
-    document.getElementById('st-docs').textContent     = d.total_documents_processed;
-    document.getElementById('st-conf').textContent     = Math.round(d.avg_confidence * 100) + '%';
-  } catch(e) { toast('Failed to load stats.', 'error'); }
-}
+  // ══════════════════════════════════════════════════════════════════════════
+  //  STATS TAB
+  // ══════════════════════════════════════════════════════════════════════════
+  async function loadStats() {
+    try {
+      const json = await (await fetch(`${API}/stats`)).json();
+      const d = json.data;
+      document.getElementById('st-total').textContent    = d.total_sessions;
+      document.getElementById('st-verified').textContent = d.verified;
+      document.getElementById('st-partial').textContent  = d.partial;
+      document.getElementById('st-failed').textContent   = d.failed;
+      document.getElementById('st-docs').textContent     = d.total_documents_processed;
+      document.getElementById('st-conf').textContent     = Math.round(d.avg_confidence * 100) + '%';
+    } catch(e) { toast('Failed to load stats.','error'); }
+  }
 
-/* ── Toast ─────────────────────────────────────────────────────────────── */
-function toast(msg, type = 'success') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 4000);
-}
+  // ══════════════════════════════════════════════════════════════════════════
+  //  TOAST
+  // ══════════════════════════════════════════════════════════════════════════
+  function toast(msg, type='success') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
 </script>
 </body>
 </html>
